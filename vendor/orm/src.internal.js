@@ -1,5 +1,5 @@
 import {
-  type as type__6, listBuilderAdd as listBuilderAdd_89, listBuilderToList as listBuilderToList_90, mapBuilderConstructor as mapBuilderConstructor_94, cmpInt32 as cmpInt32_2046, listedGet as listedGet_99, mappedGetOr as mappedGetOr_102, mapBuilderSet as mapBuilderSet_103, mappedToMap as mappedToMap_104, stringCountBetween as stringCountBetween_124, stringToInt32 as stringToInt32_132, stringToInt64 as stringToInt64_139, stringToFloat64 as stringToFloat64_146, mappedToList as mappedToList_160, cmpFloat64 as cmpFloat64_203, float64ToString as float64ToString_204, eqFloat64 as eqFloat64_213, requireStringIndex as requireStringIndex_241, stringNext as stringNext_253, stringGet as stringGet_257, listedJoin as listedJoin_298, listBuilderAddAll as listBuilderAddAll_609, stringBuilderAppendCodePoint as stringBuilderAppendCodePoint_694, mapConstructor as mapConstructor_727, panic as panic_796, pairConstructor as pairConstructor_801
+  type as type__6, listBuilderAdd as listBuilderAdd_89, listBuilderToList as listBuilderToList_90, mapBuilderConstructor as mapBuilderConstructor_94, cmpInt32 as cmpInt32_2122, listedGet as listedGet_99, mappedGetOr as mappedGetOr_102, mapBuilderSet as mapBuilderSet_103, mappedToMap as mappedToMap_104, stringCountBetween as stringCountBetween_124, stringToInt32 as stringToInt32_132, stringToInt64 as stringToInt64_139, stringToFloat64 as stringToFloat64_146, mappedToList as mappedToList_160, cmpFloat64 as cmpFloat64_203, float64ToString as float64ToString_204, eqFloat64 as eqFloat64_213, requireStringIndex as requireStringIndex_241, stringNext as stringNext_253, stringGet as stringGet_257, listedJoin as listedJoin_298, listBuilderAddAll as listBuilderAddAll_609, stringBuilderAppendCodePoint as stringBuilderAppendCodePoint_713, mapConstructor as mapConstructor_770, panic as panic_839, pairConstructor as pairConstructor_844
 } from "@temperlang/core";
 export class ChangesetError extends type__6() {
   /** @type {string} */
@@ -2450,10 +2450,21 @@ export class SqlFragment extends type__6() {
     }
     return builder_670[0];
   }
-  /** @param {Array<SqlPart>} parts_672 */
-  constructor(parts_672) {
+  /** @returns {ParameterizedSql} */
+  toParameterized() {
+    const text_673 = [""];
+    const params_674 = [];
+    let i_675 = 0;
+    while (i_675 < this.#parts_667.length) {
+      listedGet_99(this.#parts_667, i_675).formatParameterized(text_673, params_674);
+      i_675 = i_675 + 1 | 0;
+    }
+    return new ParameterizedSql(text_673[0], listBuilderToList_90(params_674));
+  }
+  /** @param {Array<SqlPart>} parts_676 */
+  constructor(parts_676) {
     super ();
-    this.#parts_667 = parts_672;
+    this.#parts_667 = parts_676;
     return;
   }
   /** @returns {Array<SqlPart>} */
@@ -2461,166 +2472,276 @@ export class SqlFragment extends type__6() {
     return this.#parts_667;
   }
 };
+export class ParameterizedSql extends type__6() {
+  /** @type {string} */
+  #text_678;
+  /** @type {Array<string>} */
+  #params_679;
+  /**
+   * @param {{
+   *   text: string, params: Array<string>
+   * }}
+   * props
+   * @returns {ParameterizedSql}
+   */
+  static["new"](props) {
+    return new ParameterizedSql(props.text, props.params);
+  }
+  /**
+   * @param {string} text_680
+   * @param {Array<string>} params_681
+   */
+  constructor(text_680, params_681) {
+    super ();
+    this.#text_678 = text_680;
+    this.#params_679 = params_681;
+    return;
+  }
+  /** @returns {string} */
+  get text() {
+    return this.#text_678;
+  }
+  /** @returns {Array<string>} */
+  get params() {
+    return this.#params_679;
+  }
+};
 export class SqlPart extends type__6() {
-  /** @param {globalThis.Array<string>} builder_675 */
-  formatTo(builder_675) {
+  /** @param {globalThis.Array<string>} builder_685 */
+  formatTo(builder_685) {
+    null;
+  }
+  /**
+   * @param {globalThis.Array<string>} text_687
+   * @param {Array<string>} params_688
+   */
+  formatParameterized(text_687, params_688) {
     null;
   }
 };
 export class SqlSource extends type__6(SqlPart) {
   /** @type {string} */
-  #source_676;
-  /** @param {globalThis.Array<string>} builder_678 */
-  formatTo(builder_678) {
-    void (builder_678[0] += this.#source_676);
+  #source_689;
+  /** @param {globalThis.Array<string>} builder_691 */
+  formatTo(builder_691) {
+    void (builder_691[0] += this.#source_689);
     return;
   }
-  /** @param {string} source_679 */
-  constructor(source_679) {
+  /**
+   * @param {globalThis.Array<string>} text_693
+   * @param {Array<string>} params_694
+   */
+  formatParameterized(text_693, params_694) {
+    void (text_693[0] += this.#source_689);
+    return;
+  }
+  /** @param {string} source_695 */
+  constructor(source_695) {
     super ();
-    this.#source_676 = source_679;
+    this.#source_689 = source_695;
     return;
   }
   /** @returns {string} */
   get source() {
-    return this.#source_676;
+    return this.#source_689;
   }
 };
 export class SqlBoolean extends type__6(SqlPart) {
   /** @type {boolean} */
-  #value_681;
-  /** @param {globalThis.Array<string>} builder_683 */
-  formatTo(builder_683) {
-    let t_684;
-    if (this.#value_681) {
-      t_684 = "TRUE";
+  #value_697;
+  /** @param {globalThis.Array<string>} builder_699 */
+  formatTo(builder_699) {
+    let t_700;
+    if (this.#value_697) {
+      t_700 = "TRUE";
     } else {
-      t_684 = "FALSE";
+      t_700 = "FALSE";
     }
-    void (builder_683[0] += t_684);
+    void (builder_699[0] += t_700);
     return;
   }
-  /** @param {boolean} value_685 */
-  constructor(value_685) {
+  /**
+   * @param {globalThis.Array<string>} text_702
+   * @param {Array<string>} params_703
+   */
+  formatParameterized(text_702, params_703) {
+    this.formatTo(text_702);
+    return;
+  }
+  /** @param {boolean} value_704 */
+  constructor(value_704) {
     super ();
-    this.#value_681 = value_685;
+    this.#value_697 = value_704;
     return;
   }
   /** @returns {boolean} */
   get value() {
-    return this.#value_681;
+    return this.#value_697;
   }
 };
 export class SqlDate extends type__6(SqlPart) {
   /** @type {globalThis.Date} */
-  #value_687;
-  /** @param {globalThis.Array<string>} builder_689 */
-  formatTo(builder_689) {
-    void (builder_689[0] += "'");
-    const this_690 = this.#value_687.toISOString().split("T")[0];
-    let index_691 = 0;
-    while (this_690.length > index_691) {
-      const codePoint_692 = stringGet_257(this_690, index_691);
-      const c_693 = codePoint_692;
-      if (c_693 === 39) {
-        void (builder_689[0] += "''");
+  #value_706;
+  /** @param {globalThis.Array<string>} builder_708 */
+  formatTo(builder_708) {
+    void (builder_708[0] += "'");
+    const this_709 = this.#value_706.toISOString().split("T")[0];
+    let index_710 = 0;
+    while (this_709.length > index_710) {
+      const codePoint_711 = stringGet_257(this_709, index_710);
+      const c_712 = codePoint_711;
+      if (c_712 === 39) {
+        void (builder_708[0] += "''");
       } else {
         try {
-          stringBuilderAppendCodePoint_694(builder_689, c_693);
+          stringBuilderAppendCodePoint_713(builder_708, c_712);
         } catch {
           throw Error();
         }
       }
-      index_691 = stringNext_253(this_690, index_691);
+      index_710 = stringNext_253(this_709, index_710);
     }
-    void (builder_689[0] += "'");
+    void (builder_708[0] += "'");
     return;
   }
-  /** @param {globalThis.Date} value_695 */
-  constructor(value_695) {
+  /**
+   * @param {globalThis.Array<string>} text_715
+   * @param {Array<string>} params_716
+   */
+  formatParameterized(text_715, params_716) {
+    placeholder_717(text_715, params_716, this.#value_706.toISOString().split("T")[0]);
+    return;
+  }
+  /** @param {globalThis.Date} value_718 */
+  constructor(value_718) {
     super ();
-    this.#value_687 = value_695;
+    this.#value_706 = value_718;
     return;
   }
   /** @returns {globalThis.Date} */
   get value() {
-    return this.#value_687;
+    return this.#value_706;
   }
 };
 export class SqlFloat64 extends type__6(SqlPart) {
   /** @type {number} */
-  #value_697;
-  /** @param {globalThis.Array<string>} builder_699 */
-  formatTo(builder_699) {
-    const s_700 = float64ToString_204(this.#value_697);
-    let t_701;
-    if (s_700 === "NaN") {
-      t_701 = true;
-    } else if (s_700 === "Infinity") {
-      t_701 = true;
+  #value_720;
+  /** @param {globalThis.Array<string>} builder_722 */
+  formatTo(builder_722) {
+    const s_723 = float64ToString_204(this.#value_720);
+    let t_724;
+    if (s_723 === "NaN") {
+      t_724 = true;
+    } else if (s_723 === "Infinity") {
+      t_724 = true;
     } else {
-      t_701 = s_700 === "-Infinity";
+      t_724 = s_723 === "-Infinity";
     }
-    if (t_701) {
-      void (builder_699[0] += "NULL");
+    if (t_724) {
+      void (builder_722[0] += "NULL");
     } else {
-      void (builder_699[0] += s_700);
+      void (builder_722[0] += s_723);
     }
     return;
   }
-  /** @param {number} value_702 */
-  constructor(value_702) {
+  /**
+   * @param {globalThis.Array<string>} text_726
+   * @param {Array<string>} params_727
+   */
+  formatParameterized(text_726, params_727) {
+    const s_728 = float64ToString_204(this.#value_720);
+    let t_729;
+    if (s_728 === "NaN") {
+      t_729 = true;
+    } else if (s_728 === "Infinity") {
+      t_729 = true;
+    } else {
+      t_729 = s_728 === "-Infinity";
+    }
+    if (t_729) {
+      void (text_726[0] += "NULL");
+    } else {
+      placeholder_717(text_726, params_727, s_728);
+    }
+    return;
+  }
+  /** @param {number} value_730 */
+  constructor(value_730) {
     super ();
-    this.#value_697 = value_702;
+    this.#value_720 = value_730;
     return;
   }
   /** @returns {number} */
   get value() {
-    return this.#value_697;
+    return this.#value_720;
   }
 };
 export class SqlInt32 extends type__6(SqlPart) {
   /** @type {number} */
-  #value_704;
-  /** @param {globalThis.Array<string>} builder_706 */
-  formatTo(builder_706) {
-    void (builder_706[0] += this.#value_704.toString());
+  #value_732;
+  /** @param {globalThis.Array<string>} builder_734 */
+  formatTo(builder_734) {
+    void (builder_734[0] += this.#value_732.toString());
     return;
   }
-  /** @param {number} value_707 */
-  constructor(value_707) {
+  /**
+   * @param {globalThis.Array<string>} text_736
+   * @param {Array<string>} params_737
+   */
+  formatParameterized(text_736, params_737) {
+    placeholder_717(text_736, params_737, this.#value_732.toString());
+    return;
+  }
+  /** @param {number} value_738 */
+  constructor(value_738) {
     super ();
-    this.#value_704 = value_707;
+    this.#value_732 = value_738;
     return;
   }
   /** @returns {number} */
   get value() {
-    return this.#value_704;
+    return this.#value_732;
   }
 };
 export class SqlInt64 extends type__6(SqlPart) {
   /** @type {bigint} */
-  #value_709;
-  /** @param {globalThis.Array<string>} builder_711 */
-  formatTo(builder_711) {
-    void (builder_711[0] += this.#value_709.toString());
+  #value_740;
+  /** @param {globalThis.Array<string>} builder_742 */
+  formatTo(builder_742) {
+    void (builder_742[0] += this.#value_740.toString());
     return;
   }
-  /** @param {bigint} value_712 */
-  constructor(value_712) {
+  /**
+   * @param {globalThis.Array<string>} text_744
+   * @param {Array<string>} params_745
+   */
+  formatParameterized(text_744, params_745) {
+    placeholder_717(text_744, params_745, this.#value_740.toString());
+    return;
+  }
+  /** @param {bigint} value_746 */
+  constructor(value_746) {
     super ();
-    this.#value_709 = value_712;
+    this.#value_740 = value_746;
     return;
   }
   /** @returns {bigint} */
   get value() {
-    return this.#value_709;
+    return this.#value_740;
   }
 };
 export class SqlDefault extends type__6(SqlPart) {
-  /** @param {globalThis.Array<string>} builder_715 */
-  formatTo(builder_715) {
-    void (builder_715[0] += "DEFAULT");
+  /** @param {globalThis.Array<string>} builder_749 */
+  formatTo(builder_749) {
+    void (builder_749[0] += "DEFAULT");
+    return;
+  }
+  /**
+   * @param {globalThis.Array<string>} text_751
+   * @param {Array<string>} params_752
+   */
+  formatParameterized(text_751, params_752) {
+    this.formatTo(text_751);
     return;
   }
   constructor() {
@@ -2630,378 +2751,397 @@ export class SqlDefault extends type__6(SqlPart) {
 };
 export class SqlString extends type__6(SqlPart) {
   /** @type {string} */
-  #value_716;
-  /** @param {globalThis.Array<string>} builder_718 */
-  formatTo(builder_718) {
-    void (builder_718[0] += "'");
-    const this_719 = this.#value_716;
-    let index_720 = 0;
-    while (this_719.length > index_720) {
-      const codePoint_721 = stringGet_257(this_719, index_720);
-      const c_722 = codePoint_721;
-      if (c_722 === 39) {
-        void (builder_718[0] += "''");
+  #value_753;
+  /** @param {globalThis.Array<string>} builder_755 */
+  formatTo(builder_755) {
+    void (builder_755[0] += "'");
+    const this_756 = this.#value_753;
+    let index_757 = 0;
+    while (this_756.length > index_757) {
+      const codePoint_758 = stringGet_257(this_756, index_757);
+      const c_759 = codePoint_758;
+      if (c_759 === 39) {
+        void (builder_755[0] += "''");
       } else {
         try {
-          stringBuilderAppendCodePoint_694(builder_718, c_722);
+          stringBuilderAppendCodePoint_713(builder_755, c_759);
         } catch {
           throw Error();
         }
       }
-      index_720 = stringNext_253(this_719, index_720);
+      index_757 = stringNext_253(this_756, index_757);
     }
-    void (builder_718[0] += "'");
+    void (builder_755[0] += "'");
     return;
   }
-  /** @param {string} value_723 */
-  constructor(value_723) {
+  /**
+   * @param {globalThis.Array<string>} text_761
+   * @param {Array<string>} params_762
+   */
+  formatParameterized(text_761, params_762) {
+    placeholder_717(text_761, params_762, this.#value_753);
+    return;
+  }
+  /** @param {string} value_763 */
+  constructor(value_763) {
     super ();
-    this.#value_716 = value_723;
+    this.#value_753 = value_763;
     return;
   }
   /** @returns {string} */
   get value() {
-    return this.#value_716;
+    return this.#value_753;
   }
 };
 /**
- * @param {TableDef} tableDef_725
- * @param {Map<string, string>} params_726
+ * @param {globalThis.Array<string>} text_765
+ * @param {Array<string>} params_766
+ * @param {string} value_767
+ */
+export function placeholder_717(text_765, params_766, value_767) {
+  listBuilderAdd_89(params_766, value_767);
+  void (text_765[0] += "$");
+  void (text_765[0] += params_766.length.toString());
+  return;
+};
+/**
+ * @param {TableDef} tableDef_768
+ * @param {Map<string, string>} params_769
  * @returns {Changeset}
  */
-export function changeset(tableDef_725, params_726) {
-  return new ChangesetImpl(tableDef_725, params_726, mapConstructor_727(Object.freeze([])), Object.freeze([]), true);
+export function changeset(tableDef_768, params_769) {
+  return new ChangesetImpl(tableDef_768, params_769, mapConstructor_770(Object.freeze([])), Object.freeze([]), true);
 };
 /**
- * @param {number} c_729
+ * @param {number} c_772
  * @returns {boolean}
  */
-export function isIdentStart_728(c_729) {
-  let t_730;
-  if (c_729 >= 97) {
-    t_730 = c_729 <= 122;
+export function isIdentStart_771(c_772) {
+  let t_773;
+  if (c_772 >= 97) {
+    t_773 = c_772 <= 122;
   } else {
-    t_730 = false;
+    t_773 = false;
   }
-  if (t_730) {
+  if (t_773) {
     return true;
   } else {
-    let t_731;
-    if (c_729 >= 65) {
-      t_731 = c_729 <= 90;
+    let t_774;
+    if (c_772 >= 65) {
+      t_774 = c_772 <= 90;
     } else {
-      t_731 = false;
+      t_774 = false;
     }
-    if (t_731) {
+    if (t_774) {
       return true;
     } else {
-      return c_729 === 95;
+      return c_772 === 95;
     }
   }
 };
 /**
- * @param {number} c_733
+ * @param {number} c_776
  * @returns {boolean}
  */
-export function isIdentPart_732(c_733) {
-  if (isIdentStart_728(c_733)) {
+export function isIdentPart_775(c_776) {
+  if (isIdentStart_771(c_776)) {
     return true;
-  } else if (c_733 >= 48) {
-    return c_733 <= 57;
+  } else if (c_776 >= 48) {
+    return c_776 <= 57;
   } else {
     return false;
   }
 };
 /**
- * @param {string} name_734
+ * @param {string} name_777
  * @returns {SafeIdentifier}
  */
-export function safeIdentifier(name_734) {
-  if (! name_734) {
+export function safeIdentifier(name_777) {
+  if (! name_777) {
     throw Error();
   }
-  let idx_735 = 0;
-  if (! isIdentStart_728(stringGet_257(name_734, idx_735))) {
+  let idx_778 = 0;
+  if (! isIdentStart_771(stringGet_257(name_777, idx_778))) {
     throw Error();
   }
-  idx_735 = stringNext_253(name_734, idx_735);
-  while (name_734.length > idx_735) {
-    if (! isIdentPart_732(stringGet_257(name_734, idx_735))) {
+  idx_778 = stringNext_253(name_777, idx_778);
+  while (name_777.length > idx_778) {
+    if (! isIdentPart_775(stringGet_257(name_777, idx_778))) {
       throw Error();
     }
-    idx_735 = stringNext_253(name_734, idx_735);
+    idx_778 = stringNext_253(name_777, idx_778);
   }
-  return new ValidatedIdentifier(name_734);
+  return new ValidatedIdentifier(name_777);
 };
 /** @returns {Array<FieldDef>} */
 export function timestamps() {
-  const t_736 = safeIdentifier("inserted_at");
-  const t_737 = safeIdentifier("updated_at");
-  return Object.freeze([new FieldDef(t_736, new DateField(), true, new SqlDefault(), false), new FieldDef(t_737, new DateField(), true, new SqlDefault(), false)]);
+  const t_779 = safeIdentifier("inserted_at");
+  const t_780 = safeIdentifier("updated_at");
+  return Object.freeze([new FieldDef(t_779, new DateField(), true, new SqlDefault(), false), new FieldDef(t_780, new DateField(), true, new SqlDefault(), false)]);
 };
 /**
- * @param {TableDef} tableDef_738
- * @param {number} id_739
+ * @param {TableDef} tableDef_781
+ * @param {number} id_782
  * @returns {SqlFragment}
  */
-export function deleteSql(tableDef_738, id_739) {
-  const b_740 = new SqlBuilder();
-  b_740.appendSafe("DELETE FROM ");
-  b_740.appendSafe(tableDef_738.tableName.sqlValue);
-  b_740.appendSafe(" WHERE ");
-  b_740.appendSafe(tableDef_738.pkName());
-  b_740.appendSafe(" = ");
-  b_740.appendInt32(id_739);
-  return b_740.accumulated;
+export function deleteSql(tableDef_781, id_782) {
+  const b_783 = new SqlBuilder();
+  b_783.appendSafe("DELETE FROM ");
+  b_783.appendSafe(tableDef_781.tableName.sqlValue);
+  b_783.appendSafe(" WHERE ");
+  b_783.appendSafe(tableDef_781.pkName());
+  b_783.appendSafe(" = ");
+  b_783.appendInt32(id_782);
+  return b_783.accumulated;
 };
 /**
- * @param {SqlBuilder} b_741
- * @param {Array<WhereClause>} conditions_742
+ * @param {SqlBuilder} b_784
+ * @param {Array<WhereClause>} conditions_785
  */
-export function renderWhere_462(b_741, conditions_742) {
-  if (! ! conditions_742.length) {
-    b_741.appendSafe(" WHERE ");
-    b_741.appendFragment(listedGet_99(conditions_742, 0).condition);
-    let i_743 = 1;
-    while (i_743 < conditions_742.length) {
-      b_741.appendSafe(" ");
-      b_741.appendSafe(listedGet_99(conditions_742, i_743).keyword());
-      b_741.appendSafe(" ");
-      b_741.appendFragment(listedGet_99(conditions_742, i_743).condition);
-      i_743 = i_743 + 1 | 0;
+export function renderWhere_462(b_784, conditions_785) {
+  if (! ! conditions_785.length) {
+    b_784.appendSafe(" WHERE ");
+    b_784.appendFragment(listedGet_99(conditions_785, 0).condition);
+    let i_786 = 1;
+    while (i_786 < conditions_785.length) {
+      b_784.appendSafe(" ");
+      b_784.appendSafe(listedGet_99(conditions_785, i_786).keyword());
+      b_784.appendSafe(" ");
+      b_784.appendFragment(listedGet_99(conditions_785, i_786).condition);
+      i_786 = i_786 + 1 | 0;
     }
   }
   return;
 };
 /**
- * @param {SqlBuilder} b_744
- * @param {Array<JoinClause>} joinClauses_745
+ * @param {SqlBuilder} b_787
+ * @param {Array<JoinClause>} joinClauses_788
  */
-export function renderJoins_461(b_744, joinClauses_745) {
-  const this_746 = joinClauses_745;
-  const n_747 = this_746.length;
-  let i_748 = 0;
-  while (i_748 < n_747) {
-    const el_749 = listedGet_99(this_746, i_748);
-    i_748 = i_748 + 1 | 0;
-    const jc_750 = el_749;
-    b_744.appendSafe(" ");
-    b_744.appendSafe(jc_750.joinType.keyword());
-    b_744.appendSafe(" ");
-    b_744.appendSafe(jc_750.table.sqlValue);
-    const oc_751 = jc_750.onCondition;
-    if (!(oc_751 == null)) {
-      const oc_752 = oc_751;
-      b_744.appendSafe(" ON ");
-      b_744.appendFragment(oc_752);
+export function renderJoins_461(b_787, joinClauses_788) {
+  const this_789 = joinClauses_788;
+  const n_790 = this_789.length;
+  let i_791 = 0;
+  while (i_791 < n_790) {
+    const el_792 = listedGet_99(this_789, i_791);
+    i_791 = i_791 + 1 | 0;
+    const jc_793 = el_792;
+    b_787.appendSafe(" ");
+    b_787.appendSafe(jc_793.joinType.keyword());
+    b_787.appendSafe(" ");
+    b_787.appendSafe(jc_793.table.sqlValue);
+    const oc_794 = jc_793.onCondition;
+    if (!(oc_794 == null)) {
+      const oc_795 = oc_794;
+      b_787.appendSafe(" ON ");
+      b_787.appendFragment(oc_795);
     }
   }
   return;
 };
 /**
- * @param {SqlBuilder} b_753
- * @param {Array<SafeIdentifier>} groupByFields_754
+ * @param {SqlBuilder} b_796
+ * @param {Array<SafeIdentifier>} groupByFields_797
  */
-export function renderGroupBy_463(b_753, groupByFields_754) {
-  if (! ! groupByFields_754.length) {
-    b_753.appendSafe(" GROUP BY ");
-    function fn_755(f_756) {
-      return f_756.sqlValue;
+export function renderGroupBy_463(b_796, groupByFields_797) {
+  if (! ! groupByFields_797.length) {
+    b_796.appendSafe(" GROUP BY ");
+    function fn_798(f_799) {
+      return f_799.sqlValue;
     }
-    b_753.appendSafe(listedJoin_298(groupByFields_754, ", ", fn_755));
+    b_796.appendSafe(listedJoin_298(groupByFields_797, ", ", fn_798));
   }
   return;
 };
 /**
- * @param {SqlBuilder} b_757
- * @param {Array<WhereClause>} havingConditions_758
+ * @param {SqlBuilder} b_800
+ * @param {Array<WhereClause>} havingConditions_801
  */
-export function renderHaving_464(b_757, havingConditions_758) {
-  if (! ! havingConditions_758.length) {
-    b_757.appendSafe(" HAVING ");
-    b_757.appendFragment(listedGet_99(havingConditions_758, 0).condition);
-    let i_759 = 1;
-    while (i_759 < havingConditions_758.length) {
-      b_757.appendSafe(" ");
-      b_757.appendSafe(listedGet_99(havingConditions_758, i_759).keyword());
-      b_757.appendSafe(" ");
-      b_757.appendFragment(listedGet_99(havingConditions_758, i_759).condition);
-      i_759 = i_759 + 1 | 0;
+export function renderHaving_464(b_800, havingConditions_801) {
+  if (! ! havingConditions_801.length) {
+    b_800.appendSafe(" HAVING ");
+    b_800.appendFragment(listedGet_99(havingConditions_801, 0).condition);
+    let i_802 = 1;
+    while (i_802 < havingConditions_801.length) {
+      b_800.appendSafe(" ");
+      b_800.appendSafe(listedGet_99(havingConditions_801, i_802).keyword());
+      b_800.appendSafe(" ");
+      b_800.appendFragment(listedGet_99(havingConditions_801, i_802).condition);
+      i_802 = i_802 + 1 | 0;
     }
   }
   return;
 };
 /**
- * @param {SafeIdentifier} tableName_760
+ * @param {SafeIdentifier} tableName_803
  * @returns {Query}
  */
-export function from(tableName_760) {
-  return new Query(tableName_760, Object.freeze([]), Object.freeze([]), Object.freeze([]), null, null, Object.freeze([]), Object.freeze([]), Object.freeze([]), false, Object.freeze([]), null);
+export function from(tableName_803) {
+  return new Query(tableName_803, Object.freeze([]), Object.freeze([]), Object.freeze([]), null, null, Object.freeze([]), Object.freeze([]), Object.freeze([]), false, Object.freeze([]), null);
 };
 /**
- * @param {SafeIdentifier} table_761
- * @param {SafeIdentifier} column_762
+ * @param {SafeIdentifier} table_804
+ * @param {SafeIdentifier} column_805
  * @returns {SqlFragment}
  */
-export function col(table_761, column_762) {
-  const b_763 = new SqlBuilder();
-  b_763.appendSafe(table_761.sqlValue);
-  b_763.appendSafe(".");
-  b_763.appendSafe(column_762.sqlValue);
-  return b_763.accumulated;
+export function col(table_804, column_805) {
+  const b_806 = new SqlBuilder();
+  b_806.appendSafe(table_804.sqlValue);
+  b_806.appendSafe(".");
+  b_806.appendSafe(column_805.sqlValue);
+  return b_806.accumulated;
 };
 /** @returns {SqlFragment} */
 export function countAll() {
-  const b_764 = new SqlBuilder();
-  b_764.appendSafe("COUNT(*)");
-  return b_764.accumulated;
+  const b_807 = new SqlBuilder();
+  b_807.appendSafe("COUNT(*)");
+  return b_807.accumulated;
 };
 /**
- * @param {SafeIdentifier} field_765
+ * @param {SafeIdentifier} field_808
  * @returns {SqlFragment}
  */
-export function countCol(field_765) {
-  const b_766 = new SqlBuilder();
-  b_766.appendSafe("COUNT(");
-  b_766.appendSafe(field_765.sqlValue);
-  b_766.appendSafe(")");
-  return b_766.accumulated;
+export function countCol(field_808) {
+  const b_809 = new SqlBuilder();
+  b_809.appendSafe("COUNT(");
+  b_809.appendSafe(field_808.sqlValue);
+  b_809.appendSafe(")");
+  return b_809.accumulated;
 };
 /**
- * @param {SafeIdentifier} field_767
+ * @param {SafeIdentifier} field_810
  * @returns {SqlFragment}
  */
-export function sumCol(field_767) {
-  const b_768 = new SqlBuilder();
-  b_768.appendSafe("SUM(");
-  b_768.appendSafe(field_767.sqlValue);
-  b_768.appendSafe(")");
-  return b_768.accumulated;
+export function sumCol(field_810) {
+  const b_811 = new SqlBuilder();
+  b_811.appendSafe("SUM(");
+  b_811.appendSafe(field_810.sqlValue);
+  b_811.appendSafe(")");
+  return b_811.accumulated;
 };
 /**
- * @param {SafeIdentifier} field_769
+ * @param {SafeIdentifier} field_812
  * @returns {SqlFragment}
  */
-export function avgCol(field_769) {
-  const b_770 = new SqlBuilder();
-  b_770.appendSafe("AVG(");
-  b_770.appendSafe(field_769.sqlValue);
-  b_770.appendSafe(")");
-  return b_770.accumulated;
+export function avgCol(field_812) {
+  const b_813 = new SqlBuilder();
+  b_813.appendSafe("AVG(");
+  b_813.appendSafe(field_812.sqlValue);
+  b_813.appendSafe(")");
+  return b_813.accumulated;
 };
 /**
- * @param {SafeIdentifier} field_771
+ * @param {SafeIdentifier} field_814
  * @returns {SqlFragment}
  */
-export function minCol(field_771) {
-  const b_772 = new SqlBuilder();
-  b_772.appendSafe("MIN(");
-  b_772.appendSafe(field_771.sqlValue);
-  b_772.appendSafe(")");
-  return b_772.accumulated;
+export function minCol(field_814) {
+  const b_815 = new SqlBuilder();
+  b_815.appendSafe("MIN(");
+  b_815.appendSafe(field_814.sqlValue);
+  b_815.appendSafe(")");
+  return b_815.accumulated;
 };
 /**
- * @param {SafeIdentifier} field_773
+ * @param {SafeIdentifier} field_816
  * @returns {SqlFragment}
  */
-export function maxCol(field_773) {
-  const b_774 = new SqlBuilder();
-  b_774.appendSafe("MAX(");
-  b_774.appendSafe(field_773.sqlValue);
-  b_774.appendSafe(")");
-  return b_774.accumulated;
+export function maxCol(field_816) {
+  const b_817 = new SqlBuilder();
+  b_817.appendSafe("MAX(");
+  b_817.appendSafe(field_816.sqlValue);
+  b_817.appendSafe(")");
+  return b_817.accumulated;
 };
 /**
- * @param {Query} a_775
- * @param {Query} b_776
+ * @param {Query} a_818
+ * @param {Query} b_819
  * @returns {SqlFragment}
  */
-export function unionSql(a_775, b_776) {
-  const sb_777 = new SqlBuilder();
-  sb_777.appendSafe("(");
-  sb_777.appendFragment(a_775.toSql());
-  sb_777.appendSafe(") UNION (");
-  sb_777.appendFragment(b_776.toSql());
-  sb_777.appendSafe(")");
-  return sb_777.accumulated;
+export function unionSql(a_818, b_819) {
+  const sb_820 = new SqlBuilder();
+  sb_820.appendSafe("(");
+  sb_820.appendFragment(a_818.toSql());
+  sb_820.appendSafe(") UNION (");
+  sb_820.appendFragment(b_819.toSql());
+  sb_820.appendSafe(")");
+  return sb_820.accumulated;
 };
 /**
- * @param {Query} a_778
- * @param {Query} b_779
+ * @param {Query} a_821
+ * @param {Query} b_822
  * @returns {SqlFragment}
  */
-export function unionAllSql(a_778, b_779) {
-  const sb_780 = new SqlBuilder();
-  sb_780.appendSafe("(");
-  sb_780.appendFragment(a_778.toSql());
-  sb_780.appendSafe(") UNION ALL (");
-  sb_780.appendFragment(b_779.toSql());
-  sb_780.appendSafe(")");
-  return sb_780.accumulated;
+export function unionAllSql(a_821, b_822) {
+  const sb_823 = new SqlBuilder();
+  sb_823.appendSafe("(");
+  sb_823.appendFragment(a_821.toSql());
+  sb_823.appendSafe(") UNION ALL (");
+  sb_823.appendFragment(b_822.toSql());
+  sb_823.appendSafe(")");
+  return sb_823.accumulated;
 };
 /**
- * @param {Query} a_781
- * @param {Query} b_782
+ * @param {Query} a_824
+ * @param {Query} b_825
  * @returns {SqlFragment}
  */
-export function intersectSql(a_781, b_782) {
-  const sb_783 = new SqlBuilder();
-  sb_783.appendSafe("(");
-  sb_783.appendFragment(a_781.toSql());
-  sb_783.appendSafe(") INTERSECT (");
-  sb_783.appendFragment(b_782.toSql());
-  sb_783.appendSafe(")");
-  return sb_783.accumulated;
+export function intersectSql(a_824, b_825) {
+  const sb_826 = new SqlBuilder();
+  sb_826.appendSafe("(");
+  sb_826.appendFragment(a_824.toSql());
+  sb_826.appendSafe(") INTERSECT (");
+  sb_826.appendFragment(b_825.toSql());
+  sb_826.appendSafe(")");
+  return sb_826.accumulated;
 };
 /**
- * @param {Query} a_784
- * @param {Query} b_785
+ * @param {Query} a_827
+ * @param {Query} b_828
  * @returns {SqlFragment}
  */
-export function exceptSql(a_784, b_785) {
-  const sb_786 = new SqlBuilder();
-  sb_786.appendSafe("(");
-  sb_786.appendFragment(a_784.toSql());
-  sb_786.appendSafe(") EXCEPT (");
-  sb_786.appendFragment(b_785.toSql());
-  sb_786.appendSafe(")");
-  return sb_786.accumulated;
+export function exceptSql(a_827, b_828) {
+  const sb_829 = new SqlBuilder();
+  sb_829.appendSafe("(");
+  sb_829.appendFragment(a_827.toSql());
+  sb_829.appendSafe(") EXCEPT (");
+  sb_829.appendFragment(b_828.toSql());
+  sb_829.appendSafe(")");
+  return sb_829.accumulated;
 };
 /**
- * @param {Query} q_787
- * @param {SafeIdentifier} alias_788
+ * @param {Query} q_830
+ * @param {SafeIdentifier} alias_831
  * @returns {SqlFragment}
  */
-export function subquery(q_787, alias_788) {
-  const b_789 = new SqlBuilder();
-  b_789.appendSafe("(");
-  b_789.appendFragment(q_787.toSql());
-  b_789.appendSafe(") AS ");
-  b_789.appendSafe(alias_788.sqlValue);
-  return b_789.accumulated;
+export function subquery(q_830, alias_831) {
+  const b_832 = new SqlBuilder();
+  b_832.appendSafe("(");
+  b_832.appendFragment(q_830.toSql());
+  b_832.appendSafe(") AS ");
+  b_832.appendSafe(alias_831.sqlValue);
+  return b_832.accumulated;
 };
 /**
- * @param {Query} q_790
+ * @param {Query} q_833
  * @returns {SqlFragment}
  */
-export function existsSql(q_790) {
-  const b_791 = new SqlBuilder();
-  b_791.appendSafe("EXISTS (");
-  b_791.appendFragment(q_790.toSql());
-  b_791.appendSafe(")");
-  return b_791.accumulated;
+export function existsSql(q_833) {
+  const b_834 = new SqlBuilder();
+  b_834.appendSafe("EXISTS (");
+  b_834.appendFragment(q_833.toSql());
+  b_834.appendSafe(")");
+  return b_834.accumulated;
 };
 /**
- * @param {SafeIdentifier} tableName_792
+ * @param {SafeIdentifier} tableName_835
  * @returns {UpdateQuery}
  */
-export function update(tableName_792) {
-  return new UpdateQuery(tableName_792, Object.freeze([]), Object.freeze([]), null);
+export function update(tableName_835) {
+  return new UpdateQuery(tableName_835, Object.freeze([]), Object.freeze([]), null);
 };
 /**
- * @param {SafeIdentifier} tableName_793
+ * @param {SafeIdentifier} tableName_836
  * @returns {DeleteQuery}
  */
-export function deleteFrom(tableName_793) {
-  return new DeleteQuery(tableName_793, Object.freeze([]), null);
+export function deleteFrom(tableName_836) {
+  return new DeleteQuery(tableName_836, Object.freeze([]), null);
 };
